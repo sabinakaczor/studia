@@ -92,7 +92,7 @@ private:
 class Order{
 public:
 
-    Order( int id, int number, int price, Item *item, Customer *customer) {
+    Order(int id, int number, int price, Item *item, Customer *customer) {
         this->id=id;
         this->number=number;
         this->price=price;
@@ -132,11 +132,6 @@ int main()
     customers.push_back(Customer("Omiotek", "Piotr", &countries[0]));
     customers.push_back(Customer("Smith", "John", &countries[1]));
 
-//    Order *o = new Order();
-  //  vector<Order> tab;
-    //o->id = 43;
-    //o->lastname = "fhf";
-
 
     fstream f;
     string ln, n, product;
@@ -169,12 +164,6 @@ int main()
     }else {
         cout << "błąd otwarcia order.txt";
     }
-
-    //o->lastname = "gj";
-
-    //cout << order[0] << endl;
-
-
 
 
     return 0;
