@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1479248423 source:/home/bartosz/Dokumenty/wtwo/Zakupy_zad3/main.cpp
+	<iostream>
+	<string>
+	<fstream>
+	<vector>
+

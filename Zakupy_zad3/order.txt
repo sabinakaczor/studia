@@ -1,0 +1,13 @@
+Tokar Marcin 1 20 stolik 125
+Tokar Marcin 1 3 szafa 500
+Tokar Marcin 2 7 lustro 100
+Tokar Marcin 2 3 szafa 450
+Tokar Marcin 3 7 szafa 400
+Smith John 4 15 lustro 120
+Smith John 4 1 szafa 800
+Smith John 5 1 lustro 80
+Smith John 5 1 szafa 600
+Smith John 5 2 lustro 90
+Omiotek Piotr 6 123 lustro 50
+Omiotek Piotr 6 1 szafa 540
+Omiotek Piotr 6 1 lustro 100
