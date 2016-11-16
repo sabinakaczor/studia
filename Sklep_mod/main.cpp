@@ -12,11 +12,7 @@ public:
         this->conversion_rate=conversion_rate;
         this->tax = tax;
     }
-    //getter
     string get_currency() { return currency; }
-
-     // getter (inline)
-    float get_tax() { return tax; }
 
     float convert_currency(float value) {
         return value / conversion_rate;
@@ -28,7 +24,7 @@ public:
 
 private:
     string currency;
-    float conversion_rate; //GBP - 6
+    float conversion_rate;
     float tax;
 };
 
@@ -68,16 +64,11 @@ public:
         this->country = country;
     }
     void payment(float cost) {
-        // country ma miec currency, nie odwrotnie
-        // tax w currency, nie w country
-        // w currency również pobranie kwoty brutto
-        // XY zapłacił przez internet kwotę ... <waluta>
         float real_cost = this->country->get_currency()->convert_currency
                         (this->country->get_currency()->get_gross_value(cost));
-
         string currency_name = this->country->get_currency()->get_currency();
-        // wyświetlic
-        cout << firstname << " " << lastname << " zapłacił przez internet kwotę " << real_cost << " " << currency_name << "." << endl;
+        cout << firstname << " " << lastname << " zapłacił przez internet kwotę " << real_cost
+                            << " " << currency_name << "." << endl;
     }
 
     bool identify(string lastname, string name) {
@@ -97,6 +88,7 @@ public:
         this->number=number;
     }
     float get_cost() { return price * number; }
+
 private:
     Item *item;
     int price;
@@ -106,18 +98,11 @@ private:
 class Order{
 public:
 
-    Order(int id, /*int number, int price, Item *item*/vector<OrderPosition> ops, Customer *customer) {
+    Order(int id, vector<OrderPosition> ops, Customer *customer) {
         this->id=id;
-        //this->number=number;
-        //this->price=price;
-        //this->item=item;
         this->customer=customer;
-        //this->cost=price*number;
         this->cost = count_cost(ops);
     }
-
-    //int get_id() { return id; }
-    //Customer* get_customer() { return customer; }
 
     void start_payment() { customer->payment(cost); }
 
@@ -128,7 +113,7 @@ private:
     Item *item;
     Customer *customer;
     float cost;
-    //vector<float> cost;
+
     float count_cost(vector<OrderPosition> ops) {
         float cost = 0;
         for (int i=0; i<ops.size(); ++i) {
@@ -138,16 +123,6 @@ private:
     }
 };
 
-
-/*void count_cost(vector<Order> orders) {
-    float cost = 0;
-    for(int i = 1; i<orders.size(); ++i) {
-        if(orders[i].get_id()==orders[i-1].get_id()) {
-            cost += orders[i].get_customer()->payment(orders[i].cost);
-        }
-
-    }
-}*/
 
 int get_customer_index(string ln, string n, vector<Customer> customers) {
     for (int i=0; i < customers.size(); ++i) {
@@ -188,44 +163,54 @@ int main()
     customers.push_back(Customer("Smith", "John", &countries[1]));
 
     vector<OrderPosition> ops;
-    vector<int> ids;
+    string names[2], lastnames[2], products[2];
+    int numbers[2],ids[2],prices[2];
 
     fstream f;
-    string ln, n, product;
-    int id, no, price;
+    string w;
+    int n;
     f.open("order.txt",ios::in);
     if (f.is_open()) {
-        f >> ln;
+        f >> lastnames[0];
+        f >> names[0];
+        f >> ids[0];
+        f >> numbers[0];
+        f >> products[0];
+        f >> prices[0];
+
+        int i = get_customer_index(lastnames[0],names[0],customers);
+        int j = get_product_index(products[0],items);
+
+        ops.push_back(OrderPosition(&items[j],numbers[0],prices[0]));
+
         while(!f.eof()) {
-            f >> n;
-            f >> id;
-            ids.push_back(id);
-            int s = ids.size();
-            int l = ids[s-1];
-            int k;
-            if (s>1) {
-                k=ids[s-2];
-            } else {
-                k=l;
-            }
-            f >> no;
-            f >> product;
-            f >> price;
-            int i = get_customer_index(ln,n,customers);
-            int j = get_product_index(product,items);
-            if (l>k) {
-                Order *order = new Order(id,ops,&customers[i]);
+
+            f >> lastnames[1];
+            f >> names[1];
+            f >> ids[1];
+            f >> numbers[1];
+            f >> products[1];
+            f >> prices[1];
+
+            if (ids[1]>ids[0]) {
+                Order *order = new Order(ids[0],ops,&customers[get_customer_index(lastnames[0],names[0],customers)]);
                 order->start_payment();
                 ops.erase(ops.begin(),ops.end());
             }
+            if(!f.eof())
+                ops.push_back(OrderPosition(&items[get_product_index(products[1],items)],numbers[1],prices[1]));
 
-            cout << "k: " << k << " l: " << l << endl;
-            cout << "ops size: " << ops.size() << endl;
+            lastnames[0]=lastnames[1];
+            names[0]=names[1];
+            ids[0]=ids[1];
+            numbers[0]=numbers[1];
+            products[0]=products[1];
+            prices[0]=prices[1];
 
-            ops.push_back(OrderPosition(&items[j],no,price));
-                //Order *order = new Order(id,no,price,&items[j],&customers[i]);
-            f >> ln;
         }
+        Order *order = new Order(ids[0],ops,&customers[get_customer_index(lastnames[0],names[0],customers)]);
+        order->start_payment();
+
         f.close();
     }else {
         cout << "błąd otwarcia order.txt";
