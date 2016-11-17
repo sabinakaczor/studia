@@ -2,6 +2,8 @@
 #include <string>
 #include <fstream>
 #include <vector>
+#include <cstdlib>
+#include <ctime>
 
 using namespace std;
 
@@ -15,10 +17,14 @@ public:
     string get_currency() { return currency; }
 
     float convert_currency(float value) {
-        return value / conversion_rate;
+        if (conversion_rate != 1)
+            conversion_rate += 0.05 * conversion_rate;
+        return value * conversion_rate;
     }
 
     float get_gross_value(float cost) {
+        if (currency=="PLN" && cost > 400)
+            tax = 30;
         return cost * (1 + tax / 100);
     }
 
@@ -52,6 +58,7 @@ public:
     bool identify(string product) {
         return (product==this->name);
     }
+    string get_name() { return name; }
 private:
     string name;
 };
@@ -67,8 +74,18 @@ public:
         float real_cost = this->country->get_currency()->convert_currency
                         (this->country->get_currency()->get_gross_value(cost));
         string currency_name = this->country->get_currency()->get_currency();
-        cout << firstname << " " << lastname << " zapłacił przez internet kwotę " << real_cost
-                            << " " << currency_name << "." << endl;
+        if ((real_cost > 6000 && currency_name == "PLN") || (real_cost > 1200 && currency_name == "GBP"))
+            cout << firstname << " " << lastname <<": płatność nie mogła zostać zrealizowana." << endl;
+        else {
+            int day = rand();
+            if(day % 7 == 0)
+                { cout << firstname << " " << lastname << " zapłacił przekazem pocztowym kwotę " << real_cost
+                            << " " << currency_name << "." << endl; }
+            else
+                { cout << firstname << " " << lastname << " zapłacił przez internet kwotę " << real_cost
+                            << " " << currency_name << "." << endl; }
+
+            }
     }
 
     bool identify(string lastname, string name) {
@@ -87,7 +104,12 @@ public:
         this->price=price;
         this->number=number;
     }
-    float get_cost() { return price * number; }
+    float get_cost() {
+        if (item->get_name() == "lustro" && number > 10)
+            return 0.92 * price * number;
+        else
+            return price * number;
+    }
 
 private:
     Item *item;
@@ -144,9 +166,11 @@ int get_product_index(string product, vector<Item> items) {
 
 int main()
 {
+    srand(time(NULL));
+
     vector<Currency> currencies;
     currencies.push_back(Currency("PLN", 20, 1));
-    currencies.push_back(Currency("GBP", 40, 6));
+    currencies.push_back(Currency("GBP", 40, (1/6.0)));
 
     vector<Country> countries;
     countries.push_back(Country("Polska", "PL", &currencies[0]));
@@ -181,7 +205,7 @@ int main()
         int i = get_customer_index(lastnames[0],names[0],customers);
         int j = get_product_index(products[0],items);
 
-        ops.push_back(OrderPosition(&items[j],numbers[0],prices[0]));
+        ops.push_back(OrderPosition(&items[j],prices[0],numbers[0]));
 
         while(!f.eof()) {
 
@@ -198,7 +222,7 @@ int main()
                 ops.erase(ops.begin(),ops.end());
             }
             if(!f.eof())
-                ops.push_back(OrderPosition(&items[get_product_index(products[1],items)],numbers[1],prices[1]));
+                ops.push_back(OrderPosition(&items[get_product_index(products[1],items)],prices[1],numbers[1]));
 
             lastnames[0]=lastnames[1];
             names[0]=names[1];

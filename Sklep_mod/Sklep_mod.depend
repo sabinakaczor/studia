@@ -1,7 +1,9 @@
 # depslib dependency file v1.0
-1479294458 source:/home/bartosz/Dokumenty/wtwo/Sklep_mod/main.cpp
+1479376435 source:/home/bartosz/Dokumenty/wtwo/Sklep_mod/main.cpp
 	<iostream>
 	<string>
 	<fstream>
 	<vector>
+	<cstdlib>
+	<ctime>
 
