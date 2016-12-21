@@ -1,11 +1,12 @@
 #include "Transakcje.h"
+#include <fstream>
 
 Transakcje::Transakcje()
 {
-    //ctor
+
 }
 
 Transakcje::~Transakcje()
 {
-    //dtor
+
 }
