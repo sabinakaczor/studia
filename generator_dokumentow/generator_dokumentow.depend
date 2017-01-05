@@ -1,0 +1,6 @@
+# depslib dependency file v1.0
+1483659778 source:/home/bartosz/wtwo/generator_dokumentow/main.cpp
+	<iostream>
+	<vector>
+	<fstream>
+
