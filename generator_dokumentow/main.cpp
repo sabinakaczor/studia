@@ -42,7 +42,6 @@ class Dokument
 public:
     Dokument() {}
     void show_text() {
-        //cout << this->edited_text.size();
         for(int i=0; i<this->edited_text.size(); ++i)
             cout << edited_text[i] << endl;
     }
@@ -92,7 +91,6 @@ public:
         dok->dodaj_element(s);
     }
     void edit_text(vector<string> text) {
-        cout << text.size();
         this->rozpocznij_dokument();
         for (int i=0; i<text.size(); ++i) {
             this->dodaj_linie_pozioma();
@@ -129,7 +127,6 @@ public:
         dok->dodaj_element(s);
     }
     void edit_text(vector<string> text) {
-         cout << text.size();
         this->rozpocznij_dokument();
         for (int i=0; i<text.size(); ++i) {
             this->dodaj_linie_pozioma();
@@ -154,30 +151,37 @@ private:
     vector<string> text;
 };
 
-int main()
-{
+vector<string> wczytaj_plik(const char* name) {
     ifstream f;
     string line;
     vector<string> text;
 
-    f.open("pure_text.txt",ios::in);
+    f.open(name,ios::in);
 
     if(f.is_open()) {
-        //f >> line;
         getline( f, line );
         while(!f.eof()) {
-           text.push_back(line);
+            text.push_back(line);
             getline( f, line );
-
-            //f >> line;
         }
         f.close();
     }else {
-        cout << "blad otwarcia pure_text.txt";
+        cout << "blad otwarcia " << name;
     }
+    return text;
+}
 
-    cout << text.size(); //466
+void zapisz_do_pliku(vector<string> text, const char* name) {
+    ofstream plik;
+    plik.open(name);
+    for(int i=0; i<text.size(); ++i)
+        plik<<text[i]<<endl;
+    plik.close();
+}
 
+int main()
+{
+    vector<string> text = wczytaj_plik("pure_text.txt");
     Editor *editor = new Editor(text);
     DokumentHTMLBuilder *dokhtmlbuilder = new DokumentHTMLBuilder();
     DokumentTXTBuilder *doktxtbuilder =  new DokumentTXTBuilder();
@@ -185,132 +189,19 @@ int main()
     editor->set_dokument_builder(dokhtmlbuilder);
     editor->generate_document();
     Dokument *dokhtml = editor->get_dokument();
-   // vector<string> edited =
     vector<string> texthtml = dokhtml->get_text();
-    //dokhtml->show_text();
 
-    ofstream plikhtml;
-    plikhtml.open("text_html.txt");
-    for(int i=0; i<texthtml.size(); ++i)
-        plikhtml<<texthtml[i]<<endl;
-    plikhtml.close();
-
-
-    cout << "\n";
     editor->set_dokument_builder(doktxtbuilder);
     editor->generate_document();
     Dokument *doktxt = editor->get_dokument();
     vector<string> texttxt = doktxt->get_text();
-    //doktxt->show_text();
 
-    ofstream pliktxt;
-    pliktxt.open("text_txt.txt");
-    for(int i=0; i<texttxt.size(); ++i)
-        pliktxt<<texttxt[i]<<endl;
-    pliktxt.close();
+    zapisz_do_pliku(texthtml, "blog.txt");
+    zapisz_do_pliku(texttxt, "artykul.txt");
+
+    cout << "Zapisano do plików.";
 
     return 0;
 }
-
-
-/*class Document
-{
-public:
-    void setParagraf(string *par) {
-        paragraf = par;
-    }
-    void set_linia_pozioma(string l) {
-        linia_pozioma = l;
-    }
-    void set_poczatek(string p) {
-        poczatek = p;
-    }
-    void set_koniec(string k) {
-        koniec = k;
-    }
-private:
-    string *paragraf;
-    string linia_pozioma;
-    string poczatek;
-    string koniec;
-};
-
-//glowny interface
-class Builder
-{
- public:
-    void new_Document() {
-        document = new Document();
-    }
-    Document* get_Document() {
-        return document;
-    }
-    virtual void build_paragraf(string par)=0;
-    virtual void build_linia_pozioma()=0;
-    virtual void build_poczatek()=0;
-    virtual void build_koniec()=0;
- protected:
-     Document *document;
-};
-
-class HTML : public Builder
-{
-public:
-    HTML() : Builder() {}
-    void build_paragraf(string par) {
-        document->setParagraf("<p>" + par + "</p>");
-    }
-    void build_linia_pozioma() {
-        document->set_linia_pozioma("<hr>");
-    }
-    void build_poczatek() {
-        document->set_poczatek("<html>");
-    }
-    void build_koniec() {
-        document->set_koniec("</html>");
-    }
-};
-
-class ASCII : public Builder
-{
-public:
-    ASCII() : Builder() {}
-
-    void build_paragraf(string *par) {
-        for(int i = 0; i>par->size(); ++i) {
-
-        }
-        document->setParagraf(par);
-    }
-    void build_linia_pozioma() {
-        document->set_linia_pozioma("-----------------------------");
-    }
-    void build_poczatek() {
-        document->set_poczatek("");
-    }
-    void build_koniec() {
-        document->set_koniec("");
-    }
-};
-
-class Director
-{
-public:
-    void set_Builder(Builder *b) {
-        builder = b;
-    }
-    Document* get_Document() {
-        return builder->get_Document();
-    }
-    void set_Document() {
-        builder->build_poczatek();
-        builder->build_paragraf("");
-        builder->build_linia_pozioma();
-        builder->build_koniec();
-    }
-private:
-    Builder *builder;
-};*/
-
 
 
